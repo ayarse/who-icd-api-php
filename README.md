@@ -13,6 +13,26 @@ A PHP SDK for the [WHO ICD API](https://icd.who.int/icdapi). Provides typed acce
 composer require ayarse/who-icd-api-php
 ```
 
+## Concepts
+
+If you're new to ICD, here's a quick rundown of the terminology:
+
+**ICD (International Classification of Diseases)** is the WHO's global standard for classifying diseases and health conditions. Every time a doctor records a diagnosis, files an insurance claim, or a country reports death statistics, they're using ICD codes. Think of it as the universal language hospitals and governments use to talk about diseases.
+
+**ICD-10 vs ICD-11** are two generations of this system. ICD-10 has been around since 1990 and is still widely used. ICD-11 is the current version (adopted 2019) and is far more detailed. This SDK supports both.
+
+**Foundation** is ICD-11's master knowledge base - a giant graph of every disease, symptom, and health concept the WHO recognizes. A single disease can appear under multiple parent categories here (e.g. "Tuberculosis of the lung" lives under both "Infectious diseases" and "Respiratory diseases"). You can't directly code with it, but it's the source of truth everything else is derived from.
+
+**Linearization** is a practical, codeable view extracted from the Foundation. Since real-world coding systems need each disease in exactly one place (not multiple), a linearization "flattens" the Foundation into a single-parent hierarchy and assigns codes. **MMS (Mortality and Morbidity Statistics)** is the main linearization - it's what people usually mean when they say "ICD-11 codes". You'll pass `'mms'` as the linearization name for most use cases.
+
+**Postcoordination** is ICD-11's way of adding detail to a code without needing thousands of pre-defined combinations. Instead of a separate code for "Cholera caused by Vibrio cholerae O1", you take the base code `1A00` (Cholera) and combine it with an infectious agent code using `&` (e.g. `1A00&XN62R`). The API can parse, validate, and simplify these combinations.
+
+**Release ID** (e.g. `2026-01`, `2024-01`) is a version identifier. The WHO publishes updated releases of ICD-11 periodically. Most endpoints require you to specify which release you're querying against.
+
+**DORIS** is the WHO's system for automatically determining the underlying cause of death from a death certificate. You feed it the certificate fields and it applies the WHO's selection rules to pick the single underlying cause. **COEDIT** is the related certificate-checking system that validates the coding.
+
+**Autocoding** is the NLP feature - you give it free text like "acute appendicitis" and it returns the best matching ICD code (`DB10.0`).
+
 ## Quick Start
 
 ```php
